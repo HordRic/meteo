@@ -1,9 +1,46 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:meteo/ul/welcome.dart';
 import 'package:meteo/ul/widgets/weather_item.dart';
 
 import '../models/constants.dart';
+
+Future<List> fetchHourlyWeatherData(double latitude, double longitude) async {
+  // Clé API de géolocalisation (OpenCageData)
+  const String geocodingApiKey = '457453f1a44243b2b4f70153bcb017c3';
+
+  // Clé API météo (OpenWeatherMap)
+  const String weatherApiKey = 'bad77936d76e7ba47074846a8bd704c2';
+
+  final apiUrl =
+      'https://api.openweathermap.org/data/2.5/forecast?lat=$latitude&lon=$longitude&appid=$weatherApiKey&units=metric';
+
+  try {
+    // Effectuez la requête API
+    final response = await http.get(Uri.parse(apiUrl));
+
+    // Décodez la réponse JSON
+    final jsonData = jsonDecode(response.body);
+
+    // Extrayez les prévisions horaires de la liste 'list'
+    final hourlyForecasts = jsonData['list'] as List;
+
+    // Ajoutez une clé 'time' pour chaque prévision horaire
+    // en utilisant le champ 'dt_txt' et en formatant l'heure
+    for (var forecast in hourlyForecasts) {
+      final forecastDateTime = DateTime.parse(forecast['dt_txt']);
+      forecast['time'] = DateFormat('HH:mm').format(forecastDateTime);
+    }
+
+    return hourlyForecasts;
+  } catch (e) {
+    print('Erreur lors de la récupération des données horaires : $e');
+    return [];
+  }
+}
 
 class DetailPage extends StatefulWidget {
   final List consolidatedWeatherList;
@@ -22,28 +59,35 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
+  List hourlyWeatherData = []; // Déclaration de la variable
   String imageUrl = '';
   List hourlyWeatherList = [];
+
   @override
   void initState() {
     super.initState();
-    // Extraire les données horaires de consolidatedWeatherList
-    hourlyWeatherList = widget.consolidatedWeatherList.map((item) {
-      return {
-        'temp': item['main']['temp'],
-        'time': item['applicable_date'], // Utiliser applicable_date directement
-        'weather_state_name': item['weather'][0]['main'],
-      };
-    }).toList();
-    hourlyWeatherList = hourlyWeatherList.where((hourlyWeather) {
-      // Filtrer les éléments avec des données manquantes
-      return hourlyWeather['temp'] != null &&
-          hourlyWeather['weather_state_name'] != null &&
-          hourlyWeather['time'] != null;
-    }).toList();
-
-    print(
-        'Hourly Weather List: $hourlyWeatherList'); // Afficher la liste pour déboguer
+    hourlyWeatherList = widget.consolidatedWeatherList;
+    print('Hourly Weather List: $hourlyWeatherList');
+    // Récupérez la latitude et la longitude de la localisation sélectionnée
+    final selectedLocation = widget.consolidatedWeatherList[widget.selectedId];
+    final latitude =
+        selectedLocation?['coord']?['lat'] ?? 0.0; // Valeur par défaut 0.0
+    final longitude =
+        selectedLocation?['coord']?['lon'] ?? 0.0; // Valeur par défaut 0.0
+    // Appelez fetchHourlyWeatherData() avec la latitude et la longitude
+    fetchHourlyWeatherData(latitude, longitude).then((data) {
+      setState(() {
+        hourlyWeatherData = data; // Initialisez la variable avec les données
+        print('consolidatedWeatherList: ${widget.consolidatedWeatherList}');
+        print('selectedLocation: $selectedLocation');
+        if (widget.selectedId < 0 ||
+            widget.selectedId >= widget.consolidatedWeatherList.length) {
+          print('selectedId invalide: ${widget.selectedId}');
+          // Gérer l'erreur, par exemple en revenant à la page précédente
+          Navigator.pop(context);
+        }
+      });
+    });
   }
 
   @override
@@ -57,26 +101,34 @@ class _DetailPageState extends State<DetailPage> {
     ).createShader(const Rect.fromLTWH(0.0, 0.0, 200.0, 70.0));
 
     int selectedIndex = 0; // Par défaut, sélectionner le premier élément
+
     // Trouver l'index de l'heure actuelle (à adapter à votre format d'heure)
     final now = DateTime.now();
     final currentHour = DateFormat('HH:mm').format(now);
-    selectedIndex = hourlyWeatherList
-        .indexWhere((hourlyWeather) => hourlyWeather['time'] == currentHour);
-    if (selectedIndex == -1) {
-      selectedIndex =
-          0; // Si l'heure actuelle n'est pas trouvée, sélectionner le premier élément
+    if (selectedIndex >= 0 && selectedIndex < hourlyWeatherData.length) {
+      var weatherStateName =
+          hourlyWeatherData[selectedIndex]['weather'][0]['main'] ?? '';
+      imageUrl = weatherStateName.replaceAll(' ', '').toLowerCase();
+      // ... (Le reste de votre code qui utilise selectedIndex)
+    } else {
+      print("L'heure actuelle n'a pas été trouvée dans les données horaires.");
+      // Afficher un message d'erreur à l'utilisateur, ou choisir une valeur par défaut pour selectedIndex
     }
-    var selectedWeatherData = widget.consolidatedWeatherList[selectedIndex];
+    // Vérifiez si selectedIndex est dans les limites du tableau
+    if (selectedIndex >= hourlyWeatherData.length) {
+      selectedIndex = hourlyWeatherData.length - 1;
+    }
 
-    var weatherStateName = selectedWeatherData['weather_state_name'] ?? '';
+    var weatherStateName =
+        hourlyWeatherData[selectedIndex]['weather'][0]['main'] ?? '';
     imageUrl = weatherStateName.replaceAll(' ', '').toLowerCase();
-    if (widget.consolidatedWeatherList.isEmpty || hourlyWeatherList.isEmpty) {
+    if (widget.consolidatedWeatherList.isEmpty || hourlyWeatherData.isEmpty) {
       return Scaffold(
         appBar: AppBar(title: const Text('Détails')),
         body: const Center(child: Text('Aucune donnée disponible.')),
       );
     }
-
+    print('consolidatedWeatherList: ${widget.consolidatedWeatherList}');
     return Scaffold(
       backgroundColor: myConstants.secondaryColor,
       appBar: AppBar(
@@ -108,12 +160,24 @@ class _DetailPageState extends State<DetailPage> {
               width: 400,
               child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  itemCount: hourlyWeatherList.length,
+                  itemCount: hourlyWeatherData.length,
                   itemBuilder: (BuildContext context, int index) {
-                    var hourlyWeather = hourlyWeatherList[index];
-                    var weatherIcon = hourlyWeather['weather_state_name']
-                        ?.replaceAll(' ', '')
-                        .toLowerCase();
+                    var hourlyWeather = hourlyWeatherData[index];
+                    var weatherIcon = hourlyWeather['weather']?[0]?['main']
+                            ?.replaceAll(' ', '')
+                            .toLowerCase() ??
+                        'clouds';
+                    String formattedTime =
+                        'N/A'; // Valeur par défaut pour l'heure
+                    if (hourlyWeather['created'] != null) {
+                      // Vérifier si created est null
+                      try {
+                        formattedTime = DateFormat('HH:mm')
+                            .format(DateTime.parse(hourlyWeather['created']));
+                      } catch (e) {
+                        print('Erreur lors du formatage de l\'heure: $e');
+                      }
+                    }
                     return Container(
                       padding: const EdgeInsets.symmetric(vertical: 20),
                       margin: const EdgeInsets.only(right: 20),
@@ -135,8 +199,8 @@ class _DetailPageState extends State<DetailPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            hourlyWeather['temp']?.round().toString() ??
-                                hourlyWeather['time'],
+                            hourlyWeather['the_temp']?.round().toString() ??
+                                'N/A',
                             style: TextStyle(
                               fontSize: 17,
                               color: index == selectedIndex
@@ -156,7 +220,7 @@ class _DetailPageState extends State<DetailPage> {
                             },
                           ),
                           Text(
-                            hourlyWeather['time'],
+                            formattedTime,
                             style: TextStyle(
                               fontSize: 17,
                               color: index == selectedIndex
@@ -247,8 +311,8 @@ class _DetailPageState extends State<DetailPage> {
                                 children: [
                                   weatherItem(
                                     text: 'Wind Speed',
-                                    value: widget.consolidatedWeatherList[
-                                                selectedIndex]['wind_speed']
+                                    value: hourlyWeatherList[selectedIndex]
+                                                ['wind_speed']
                                             ?.round() ??
                                         0,
                                     unit: 'km/h',
@@ -256,16 +320,16 @@ class _DetailPageState extends State<DetailPage> {
                                   ),
                                   weatherItem(
                                       text: 'Humidity',
-                                      value: widget.consolidatedWeatherList[
-                                                  selectedIndex]['humidity']
+                                      value: hourlyWeatherList[selectedIndex]
+                                                  ['humidity']
                                               ?.round() ??
                                           0,
                                       unit: '',
                                       imageUrl: 'assets/humidity.png'),
                                   weatherItem(
                                     text: 'Max Temp',
-                                    value: widget.consolidatedWeatherList[
-                                                selectedIndex]['max_temp']
+                                    value: hourlyWeatherList[selectedIndex]
+                                                ['max_temp']
                                             ?.round() ??
                                         0,
                                     unit: 'C',
@@ -282,8 +346,7 @@ class _DetailPageState extends State<DetailPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  widget.consolidatedWeatherList[selectedIndex]
-                                              ['the_temp']
+                                  hourlyWeatherList[selectedIndex]['the_temp']
                                           ?.round()
                                           .toString() ??
                                       'N/A',
@@ -320,21 +383,42 @@ class _DetailPageState extends State<DetailPage> {
                             scrollDirection: Axis.vertical,
                             itemCount: widget.consolidatedWeatherList.length,
                             itemBuilder: (BuildContext context, int index) {
-                              var futureWeatherName =
-                                  widget.consolidatedWeatherList[index]
-                                      ['weather_state_name'];
-                              var futureImageURL = futureWeatherName != null
-                                  ? futureWeatherName
-                                      .replaceAll(' ', '')
+                              var weatherData =
+                                  widget.consolidatedWeatherList[index];
+                              // Vérification de null avant d'accéder à weatherData['weather'][0]['main']
+                              final weatherIcon = (weatherData['weather'] !=
+                                          null &&
+                                      weatherData['weather'].isNotEmpty &&
+                                      weatherData['weather'][0]['main'] != null)
+                                  ? weatherData['weather'][0]['main']
+                                      ?.replaceAll(' ', '')
                                       .toLowerCase()
-                                  : 'clouds'; // Image par défaut si futureWeatherName est nul
-                              Text(
-                                widget.consolidatedWeatherList[index]
-                                    ['applicable_date'], // Afficher l'heure
-                                style: const TextStyle(
-                                  color: Color(0xff6696f5),
-                                ),
-                              );
+                                  : 'clouds'; // Utilisez 'clouds' si un des champs est nul
+                              // Vérification de null avant d'accéder à weatherData['main']['temp']
+                              final temperature =
+                                  (weatherData['main'] != null &&
+                                          weatherData['main']['temp'] != null)
+                                      ? weatherData['main']['temp']
+                                          .round()
+                                          .toString()
+                                      : 'N/A';
+                              if (hourlyWeatherData.isNotEmpty) {
+                                Text(
+                                  hourlyWeatherData[index]['applicable_date'] ??
+                                      'N/A',
+                                  style: const TextStyle(
+                                    color: Color(0xff6696f5),
+                                  ),
+                                );
+                              } else {
+                                // Afficher un indicateur de chargement ou un message pendant le chargement
+                                const CircularProgressIndicator(); // ou Text('Chargement...')
+                              }
+                              final futureImageURL = weatherData['weather']?[0]
+                                          ?['main']
+                                      ?.replaceAll(' ', '')
+                                      .toLowerCase() ??
+                                  'clouds';
                               return Container(
                                 margin: const EdgeInsets.only(
                                     left: 10, top: 10, right: 10, bottom: 5),
@@ -362,7 +446,7 @@ class _DetailPageState extends State<DetailPage> {
                                         CrossAxisAlignment.center,
                                     children: [
                                       Text(
-                                        widget.consolidatedWeatherList[index]
+                                        hourlyWeatherData[index]
                                                 ['applicable_date'] ??
                                             'N/A', // Afficher 'N/A' si la valeur est null
                                         style: const TextStyle(
@@ -372,8 +456,7 @@ class _DetailPageState extends State<DetailPage> {
                                       Row(
                                         children: [
                                           Text(
-                                            widget.consolidatedWeatherList[
-                                                        index]['max_temp']
+                                            hourlyWeatherData[index]['max_temp']
                                                     ?.round()
                                                     .toString() ??
                                                 'N/A',
@@ -391,8 +474,7 @@ class _DetailPageState extends State<DetailPage> {
                                             ),
                                           ),
                                           Text(
-                                            widget.consolidatedWeatherList[
-                                                        index]['min_temp']
+                                            hourlyWeatherData[index]['min_temp']
                                                     ?.round()
                                                     .toString() ??
                                                 'N/A',
@@ -408,7 +490,7 @@ class _DetailPageState extends State<DetailPage> {
                                             MainAxisAlignment.center,
                                         children: [
                                           Image.asset(
-                                            'assets/${futureImageURL ?? 'clouds'}.png',
+                                            'assets/${weatherData['weather'] != null && weatherData['weather'].isNotEmpty && weatherData['weather'][0]['main'] != null ? weatherData['weather'][0]['main']?.replaceAll(' ', '').toLowerCase() : 'clouds'}.png',
                                             width: 30,
                                             errorBuilder:
                                                 (context, error, stackTrace) {
@@ -418,8 +500,9 @@ class _DetailPageState extends State<DetailPage> {
                                                   .error); // Afficher une icône d'erreur
                                             },
                                           ),
-                                          Text(widget.consolidatedWeatherList[
-                                              index]['weather_state_name']),
+                                          Text(hourlyWeatherData[index]
+                                                  ['weather_state_name'] ??
+                                              'N/A')
                                         ],
                                       )
                                     ],
