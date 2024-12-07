@@ -3,7 +3,7 @@ import 'package:flutter/material.dart'; // Import the Flutter material package
 import 'ul/get_started.dart'; // Import the 'get_started.dart' file from the 'ul' directory
 
 void main() {
-  runApp(MyApp()); // Launch the app with MyApp widget
+  runApp(const MyApp()); // Launch the app with MyApp widget
 }
 
 class MyApp extends StatelessWidget {

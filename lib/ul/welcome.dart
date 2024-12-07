@@ -25,8 +25,7 @@ class _WelcomeState extends State<Welcome> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: myConstant.secondaryColor,
-        title: Text(selectedCities.length.toString() +
-            ' selected'), // Display the number of selected cities
+        title: Text('${selectedCities.length} selected'), // Display the number of selected cities
       ),
       body: ListView.builder(
         itemCount: cities.length, // Number of items in the list
