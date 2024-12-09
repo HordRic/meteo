@@ -206,154 +206,156 @@ class _HomeState extends State<Home> {
           ),
         ),
       ),
-      body: Container(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              location,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 30.0,
+      body: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                location,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 30.0,
+                ),
               ),
-            ),
-            Text(
-              currentDate,
-              style: const TextStyle(
-                color: Colors.grey,
-                fontSize: 16.0,
+              Text(
+                currentDate,
+                style: const TextStyle(
+                  color: Colors.grey,
+                  fontSize: 16.0,
+                ),
               ),
-            ),
-            const SizedBox(
-              height: 50,
-            ),
-            Container(
-              width: size.width,
-              height: 200,
-              decoration: BoxDecoration(
-                  color: myConstants.primaryColor,
-                  borderRadius: BorderRadius.circular(15),
-                  boxShadow: [
-                    BoxShadow(
-                      color: myConstants.primaryColor.withOpacity(.5),
-                      offset: const Offset(0, 25),
-                      blurRadius: 10,
-                      spreadRadius: -12,
-                    )
-                  ]),
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Positioned(
-                    top: -40,
-                    left: 20,
-                    child: (imageUrl != null &&
-                            imageUrl
-                                .isNotEmpty) // Vérification de null et de vide
-                        ? Image.asset(
-                            'assets/$imageUrl.png',
-                            width: 150,
-                          )
-                        : const SizedBox(), // Afficher un SizedBox vide si imageUrl est null ou vide
-                  ),
-                  Positioned(
-                    bottom: 30,
-                    left: 20,
-                    child: Text(
-                      weatherStateName,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
+              const SizedBox(
+                height: 50,
+              ),
+              Container(
+                width: size.width,
+                height: 200,
+                decoration: BoxDecoration(
+                    color: myConstants.primaryColor,
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      BoxShadow(
+                        color: myConstants.primaryColor.withOpacity(.5),
+                        offset: const Offset(0, 25),
+                        blurRadius: 10,
+                        spreadRadius: -12,
+                      )
+                    ]),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Positioned(
+                      top: -40,
+                      left: 20,
+                      child: (imageUrl != null &&
+                              imageUrl
+                                  .isNotEmpty) // Vérification de null et de vide
+                          ? Image.asset(
+                              'assets/$imageUrl.png',
+                              width: 150,
+                            )
+                          : const SizedBox(), // Afficher un SizedBox vide si imageUrl est null ou vide
+                    ),
+                    Positioned(
+                      bottom: 30,
+                      left: 20,
+                      child: Text(
+                        weatherStateName,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                        ),
                       ),
                     ),
-                  ),
-                  Positioned(
-                    top: 20,
-                    right: 20,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 4.0),
-                          child: Text(
-                            temperature.toString(),
+                    Positioned(
+                      top: 20,
+                      right: 20,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4.0),
+                            child: Text(
+                              temperature.toString(),
+                              style: TextStyle(
+                                fontSize: 80,
+                                fontWeight: FontWeight.bold,
+                                foreground: Paint()..shader = linearGradient,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            'o',
                             style: TextStyle(
-                              fontSize: 80,
+                              fontSize: 40,
                               fontWeight: FontWeight.bold,
                               foreground: Paint()..shader = linearGradient,
                             ),
-                          ),
-                        ),
-                        Text(
-                          'o',
-                          style: TextStyle(
-                            fontSize: 40,
-                            fontWeight: FontWeight.bold,
-                            foreground: Paint()..shader = linearGradient,
-                          ),
-                        )
-                      ],
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 50,
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    weatherItem(
+                      text: 'Wind Speed',
+                      value: windSpeed,
+                      unit: 'km/h',
+                      imageUrl: 'assets/windspeed.png',
+                    ),
+                    weatherItem(
+                        text: 'Humidity',
+                        value: humidity,
+                        unit: '',
+                        imageUrl: 'assets/humidity.png'),
+                    weatherItem(
+                      text: 'Wind Speed',
+                      value: maxTemp,
+                      unit: 'C',
+                      imageUrl: 'assets/max-temp.png',
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 50,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Today',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
                     ),
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 50,
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 40),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  weatherItem(
-                    text: 'Wind Speed',
-                    value: windSpeed,
-                    unit: 'km/h',
-                    imageUrl: 'assets/windspeed.png',
-                  ),
-                  weatherItem(
-                      text: 'Humidity',
-                      value: humidity,
-                      unit: '',
-                      imageUrl: 'assets/humidity.png'),
-                  weatherItem(
-                    text: 'Wind Speed',
-                    value: maxTemp,
-                    unit: 'C',
-                    imageUrl: 'assets/max-temp.png',
+                  Text(
+                    'Next 40 Hours',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 18,
+                        color: myConstants.primaryColor),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(
-              height: 50,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Text(
-                  'Today',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24,
-                  ),
-                ),
-                Text(
-                  'Next 40 Hours',
-                  style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 18,
-                      color: myConstants.primaryColor),
-                ),
-              ],
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Expanded(
+              const SizedBox(
+                height: 20,
+              ),
+              SizedBox(
+                height: 150, // Définir une hauteur fixe pour le ListView
                 child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: consolidatedWeatherList.length,
@@ -373,14 +375,15 @@ class _HomeState extends State<Home> {
                                       )));
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 20),
+                          padding: const EdgeInsets.symmetric(vertical: 0),
                           margin: const EdgeInsets.only(
                               right: 20, bottom: 10, top: 10),
-                          width: 80,
+                          width: 75, // Augmenter la largeur
+                          height: 150, // Augmenter la hauteur
                           decoration: BoxDecoration(
                               color: false
                                   ? myConstants.primaryColor
-                                  : Colors.white,
+                                  : Colors.lightBlue,
                               borderRadius:
                                   const BorderRadius.all(Radius.circular(10)),
                               boxShadow: [
@@ -406,18 +409,22 @@ class _HomeState extends State<Home> {
                                         "°C"
                                     : 'N/A',
                                 style: TextStyle(
-                                  fontSize: 17,
+                                  fontSize:
+                                      20, // Augmenter la taille de la police
                                   color: false
                                       ? Colors.white
                                       : myConstants.primaryColor,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              SizedBox(),
+                              const SizedBox(
+                                  height:
+                                      10), // Ajouter de l'espace entre les éléments
                               Text(
                                 applicableDate,
                                 style: TextStyle(
-                                  fontSize: 17,
+                                  fontSize:
+                                      20, // Augmenter la taille de la police
                                   color: false
                                       ? Colors.white
                                       : myConstants.primaryColor,
@@ -428,8 +435,10 @@ class _HomeState extends State<Home> {
                           ),
                         ),
                       );
-                    }))
-          ],
+                    }),
+              ),
+            ],
+          ),
         ),
       ),
     );
