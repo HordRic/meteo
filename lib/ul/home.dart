@@ -383,7 +383,7 @@ class _HomeState extends State<Home> {
                           decoration: BoxDecoration(
                               color: false
                                   ? myConstants.primaryColor
-                                  : Colors.lightBlue,
+                                  : Colors.blue,
                               borderRadius:
                                   const BorderRadius.all(Radius.circular(10)),
                               boxShadow: [
