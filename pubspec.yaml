@@ -8,6 +8,7 @@ environment:
   sdk: '>=3.4.4 <4.0.0'
 
 dependencies:
+  dotenv: ^3.0.0
   flutter:
     sdk: flutter
 
@@ -21,10 +22,11 @@ dev_dependencies:
   flutter_lints: ^4.0.0
   flutter_launcher_icons: ^0.14.2
 
-flutter_icons:
+
+flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/flutter_launcher_icons.png"
+  image_path: "assets/ic_launcher.png"
 
 flutter:
   uses-material-design: true
