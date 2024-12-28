@@ -1,89 +1,88 @@
-
 # MeteoApp
 
-Application mobile pour obtenir des prévisions météorologiques.
+Mobile application for obtaining weather forecasts.
 
 ## Description
 
-MeteoApp est une application mobile développée avec Flutter qui permet d'obtenir des prévisions météorologiques de manière interactive. L'application inclut des fonctionnalités telles que des prévisions horaires, des détails météorologiques et une interface utilisateur intuitive.
+MeteoApp is a mobile application developed with Flutter that allows users to get interactive weather forecasts. The app includes features such as hourly forecasts, detailed weather information, and an intuitive user interface.
 
-## Fonctionnalités
+## Features
 
-1. **Écran de démarrage (GetStartedScreen)** :
-    - Affiche une introduction à l'application et redirige vers l'écran principal.
+1. **Get Started Screen**:
+   - Displays an introduction to the app and redirects to the main screen.
 
-2. **Écran principal (HomeScreen)** :
-    - Permet aux utilisateurs de saisir leur localisation et d'obtenir des prévisions météorologiques.
+2. **Home Screen**:
+   - Allows users to enter their location and obtain weather forecasts.
 
-3. **Écran de détails (DetailPage)** :
-    - Affiche des prévisions météorologiques détaillées pour une localisation donnée.
+3. **Detail Page**:
+   - Displays detailed weather forecasts for a given location.
 
-4. **Élément météo (WeatherItem)** :
-    - Affiche des informations météorologiques spécifiques telles que la température, l'humidité, etc.
+4. **Weather Item**:
+   - Displays specific weather information such as temperature, humidity, etc.
 
-## Utilisation
+## Usage
 
-1. **Choix de la Méthode** :
-    - L'utilisateur peut choisir parmi les différentes fonctionnalités de l'application pour obtenir des informations météorologiques précises. Les entrées de l'utilisateur sont vérifiées pour assurer la validité et la précision des affichages.
+1. **Choosing a Method**:
+   - Users can choose among various app features to obtain accurate weather information. User inputs are verified to ensure validity and accuracy of the displays.
 
-2. **Exemples de Fonctions** :
-    - **Prévisions horaires** : Affiche les prévisions météorologiques pour les heures à venir.
-    - **Détails météorologiques** : Affiche des informations détaillées sur la température, l'humidité, la vitesse du vent, etc.
-    - **Visualisation graphique** : Utilise des icônes et des graphiques pour représenter les conditions météorologiques.
+2. **Example Functions**:
+   - **Hourly Forecasts**: Displays weather forecasts for upcoming hours.
+   - **Detailed Weather Information**: Provides detailed information on temperature, humidity, wind speed, etc.
+   - **Graphical Visualization**: Uses icons and graphics to represent weather conditions.
 
-## Structure du projet
+## Project Structure
 
 ```
 lib/
-├── main.dart                : Point d'entrée de l'application.
+├── main.dart                : Entry point of the application.
 ├── ul/
-│   ├── get_started.dart     : Écran de démarrage.
-│   ├── home.dart            : Écran principal.
-│   ├── detail_page.dart     : Écran de détails météorologiques.
-│   ├── welcome.dart         : Écran de bienvenue.
+│   ├── get_started.dart     : Get Started screen.
+│   ├── home.dart            : Home screen.
+│   ├── detail_page.dart     : Weather detail page.
+│   ├── welcome.dart         : Welcome screen.
 │   └── widgets/
-│       └── weather_item.dart: Élément météo affichant des informations spécifiques.
+│       └── weather_item.dart: Weather item displaying specific information.
 ├── models/
-│   └── constants.dart       : Fichier de constantes.
+│   └── constants.dart       : Constants file.
 ```
 
-## Prérequis
+## Prerequisites
 
-- **Flutter SDK** : Installation de Flutter
-- **Android Studio** ou **Visual Studio Code** avec les extensions Flutter et Dart
+- **Flutter SDK**: Install Flutter
+- **Android Studio** or **Visual Studio Code** with Flutter and Dart extensions
 
 ## Installation
 
-1. Clonez le dépôt :
+1. Clone the repository:
 
    ```sh
    git clone https://github.com/votre-utilisateur/MeteoApp.git
    ```
 
-2. Accédez au répertoire du projet :
+2. Navigate to the project directory:
 
    ```sh
    cd MeteoApp
    ```
 
-3. Installez les dépendances :
+3. Install dependencies:
 
    ```sh
    flutter pub get
    ```
 
-4. Exécutez l'application :
+4. Run the application:
 
    ```sh
    flutter run
    ```
 
-## Téléchargement de l'APK
+## Download APK
 
-Pour télécharger la version Android de l'application mobile, veuillez utiliser le lien OneDrive suivant :
+To download the Android version of the mobile application, please use the following OneDrive link:
 
-Lien OneDrive : [https://1drv.ms/u/s!Asrl_soLHYYgg_JCUy9ycdKS5D623g?e=JNNBei](https://1drv.ms/u/s!Asrl_soLHYYgg_JCUy9ycdKS5D623g?e=JNNBei)
+OneDrive link: [https://1drv.ms/u/s!Asrl_soLHYYgg_JCUy9ycdKS5D623g?e=JNNBei](https://1drv.ms/u/s!Asrl_soLHYYgg_JCUy9ycdKS5D623g?e=JNNBei)
 
-## Remerciements
+## Acknowledgements
 
-Merci à tous pour votre soutien et vos encouragements !
+Thank you all for your support and encouragement!
